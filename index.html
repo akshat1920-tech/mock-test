@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IBPS PO Mock Test</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #e6f0ff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+header {
+  background-color: #99c2ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  font-weight: bold;
+}
+header .title {
+  font-size: 28px;
+}
+#container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding-bottom: 70px;
+}
+#questionPanel, #palettePanel {
+  border: 2px solid black;
+  padding: 10px;
+  height: calc(100vh - 60px - 70px);
+  overflow-y: auto;
+}
+#questionPanel {
+  flex: 3;
+  margin: 10px;
+}
+#palettePanel {
+  flex: 1;
+  margin: 10px;
+  background: #f0f8ff;
+}
+#question {
+  font-size: 18px;
+  margin-bottom: 15px;
+  min-height: 60px;
+}
+#options label {
+  display: block;
+  margin: 8px 0;
+  font-size: 16px;
+  padding: 5px;
+  border-radius: 4px;
+}
+#navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #e6f0ff;
+  padding: 10px 0;
+  text-align: center;
+  border-top: 2px solid #003366;
+  z-index: 1000;
+}
+#navigation button {
+  padding: 8px 15px;
+  margin: 5px;
+  border: 1px solid #003366;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #cce0ff;
+  color: black;
+}
+#navigation button:hover {
+  background-color: #99c2ff;
+}
+#submitContainer {
+  text-align: center;
+  margin-top: 20px;
+}
+#submitBtn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+}
+#submitBtn:hover {
+  background-color: #0056b3;
+}
+#paletteButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+#paletteButtons button {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-color: lightgrey;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  /* Default square shape */
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+#paletteButtons button.current {
+  /* Modified pentagon shape with flatter bottom point */
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  background-color: #99c2ff;
+  transform: scale(1.05);
+}
+#paletteButtons button.answered { background-color: lightgreen; }
+#paletteButtons button.review { background-color: violet; }
+#paletteButtons button.visited { background-color: orange; }
+#scorecard {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #003366;
+  padding: 10px;
+  background-color: #cce0ff;
+  border-radius: 5px;
+}
+.legend {
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.legend-color {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  display: inline-block;
+}
+.correct-answer {
+  background-color: #e6ffe6;
+  border-left: 4px solid #28a745;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+.incorrect-answer {
+  background-color: #ffe6e6;
+  border-left: 4px solid #dc3545;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+.unanswered {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+.solution {
+  background-color: #f8f9fa;
+  border-left: 4px solid #6c757d;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 4px;
+}
+.solution h4 {
+  margin-top: 0;
+  color: #495057;
+}
+.solution-content {
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+.tab-button {
+  padding: 8px 15px;
+  margin-right: 5px;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+#solutionTabs {
+  margin-top: 15px;
+  display: flex;
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">IBPS PO Mock Test</div>
+  <div id="timer">Time Left: 10:00</div>
+</header>
+<div id="container">
+  <div id="questionPanel">
+    <div id="scorecard" style="display:none;"></div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="answerFeedback" style="margin-top: 15px;"></div>
+    <div id="solutionTabs" style="display: none;">
+      <button class="tab-button active" onclick="showTab('answerExplanation')">Explanation</button>
+      <button class="tab-button" onclick="showTab('referenceMaterial')">Reference</button>
+      <button class="tab-button" onclick="showTab('relatedQuestions')">Related</button>
+    </div>
+    <div id="solutionContent" style="display: none;"></div>
+  </div>
+  <div id="palettePanel">
+    <h3>Question Palette</h3>
+    <div id="paletteButtons"></div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-color" style="background-color: #99c2ff;"></span> Current Question</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: lightgreen;"></span> Answered</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: violet;"></span> Marked for Review</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: orange;"></span> Visited</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: lightgrey;"></span> Not Visited</div>
+    </div>
+    <div id="submitContainer">
+      <button id="submitBtn" onclick="submitTest()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<div id="navigation">
+  <button id="prevBtn" onclick="previousQuestion()">Previous</button>
+  <button id="reviewBtn" onclick="markForReview()">Mark for Review</button>
+  <button id="clearBtn" onclick="clearResponse()">Clear</button>
+  <button id="nextBtn" onclick="saveAndNext()">Save & Next</button>
+</div>
+
+<script>
+const questions = [
+  { 
+    q: "ISRO inaugurated the HOPE analogue mission in Tso Kar Valley, Ladakh. What is the full form of the letter E in HOPE analogue mission?",
+    options: ["Exploration", "Earth", "Excellence", "Expedition", "Planetary Exploration"],
+    answer: "Planetary Exploration",
+    explanation: "HOPE stands for Himalayan Outpost for Planetary Exploration. The mission is a terrestrial analogue mission to test technologies and systems for future planetary exploration missions.",
+    reference: "The Tso Kar Valley in Ladakh was selected for its high altitude, extreme cold, and remote isolation, making it a perfect terrestrial analogue site for testing technologies, robotics, and human operational protocols critical for future interplanetary missions.",
+    related: "Other ISRO initiatives include Chandrayaan lunar missions, Mangalyaan Mars mission, and Gaganyaan human spaceflight program."
+  },
+  { 
+    q: "The Indian Army signed an MoU with a company for the procurement of new-generation 50-ton transporter trailers worth ₹223.95 crore. Which company is this?",
+    options: ["Tata Advanced Systems", "Axicades Aerospace and Technology Pvt. Ltd.", "Larsen & Toubro", "Bharat Electronics Limited", "Mahindra Defence Systems"],
+    answer: "Axicades Aerospace and Technology Pvt. Ltd.",
+    explanation: "The MoU was signed with Axicades Aerospace and Technology Pvt. Ltd. for procurement of 212 advanced 50-ton tank transporter trailers for the Indian Army.",
+    reference: "The contract, valued at ₹223.95 crore, falls under the 'Aatmanirbhar Bharat' (Self-Reliant India) initiative, aiming to boost indigenous defence manufacturing.",
+    related: "Other major defence contracts include Dhanush artillery guns, Tejas fighter aircraft, and Arjun main battle tanks."
+  },
+  { 
+    q: "Indian Navy received the third ship of Project 17A stealth frigate, Himgiri. Which company built Himgiri?",
+    options: ["Mazagon Dock Shipbuilders Ltd", "Cochin Shipyard", "Garden Reach Shipbuilders & Engineers (GRSE)", "Hindustan Shipyard Ltd", "L&T Shipbuilding"],
+    answer: "Garden Reach Shipbuilders & Engineers (GRSE)",
+    explanation: "The Himgiri, part of Project 17A, was built by GRSE and officially handed over to the Indian Navy in Kolkata, West Bengal.",
+    reference: "INS Himgiri (Yard 3025) is the first frigate delivered by GRSE under this project. It was officially handed over to the Navy in Kolkata, featuring state-of-the-art stealth technology, weaponry, and sensors.",
+    related: "Other naval projects include Project 75 submarines, Vikrant aircraft carrier, and Project 15B destroyers."
+  },
+  { 
+    q: "Ant Financial sold what percentage of stakes in Paytm for ₹383 crore?",
+    options: ["3.21%", "5.84%", "7.50%", "10%", "12%"],
+    answer: "5.84%",
+    explanation: "Ant Financial sold 5.84% of its stake in Paytm for ₹383 crore as part of its portfolio restructuring.",
+    reference: "This block of shares constituted 5.84% of the total equity of Paytm. The transaction was executed at a specific market price, aggregating to a total value of ₹383 crore, as part of Antfin's strategy to reduce its exposure in the Indian fintech firm.",
+    related: "Other major fintech investments include Walmart's acquisition of Flipkart, Google's investment in Jio Platforms, and Facebook's investment in Reliance Jio."
+  },
+  { 
+    q: "RBI approved the merger of New India Co-operative Bank with which bank?",
+    options: ["Saraswat Co-operative Bank", "Punjab & Maharashtra Co-operative Bank", "HDFC Bank", "State Bank of India", "Canara Bank"],
+    answer: "Saraswat Co-operative Bank",
+    explanation: "RBI approved the merger of New India Co-operative Bank with Saraswat Co-operative Bank to strengthen banking operations and consolidate cooperative banking.",
+    reference: "Following this merger, all branches of The New India Co-operative Bank now operate as branches of Sarswat Co-operative Bank.",
+    related: "Other recent bank mergers include Punjab National Bank with Oriental Bank of Commerce and United Bank, and Union Bank with Andhra Bank and Corporation Bank."
+  },
+  { 
+    q: "The Competition Commission of India approved the acquisition of 100% stake in Jai Prakash Associates Limited by which company?",
+    options: ["UltraTech Cement", "Dalmia Cement Bharat Limited", "ACC Limited", "Ambuja Cements", "Shree Cement"],
+    answer: "Dalmia Cement Bharat Limited",
+    explanation: "Dalmia Cement Bharat Limited acquired 100% stake in Jai Prakash Associates Limited, approved by the CCI, as part of business expansion strategy.",
+    reference: "This move is strategic for DCBL, as it significantly boosts its production capacity and expands its market footprint across key regions in India.",
+    related: "Other major acquisitions in the cement industry include Holcim's stake sale in Ambuja Cements and ACC to Adani Group, and UltraTech's acquisition of Century Textiles' cement business."
+  },
+  { 
+    q: "Who has been appointed as Director of Vikram Sarabhai Space Centre, Thiruvananthapuram?",
+    options: ["K. Sivan", "A. Rajarajan", "S. Unnikrishnan", "M. Annadurai", "R. Umamaheshwaran"],
+    answer: "A. Rajarajan",
+    explanation: "A. Rajarajan has been appointed as the Director of Vikram Sarabhai Space Centre, Kerala, which is a premier center for ISRO's launch vehicle and space technology research.",
+    reference: "He took over from S. Unnikrishnan Nair. In this role, Dr. Rajarajan leads critical national projects, including the Gaganyaan human spaceflight program and the development of next-generation launch vehicles.",
+    related: "Other key ISRO appointments include S. Somanath as Chairman, ISRO and Unnikrishnan Nair as Director, Human Space Flight Centre."
+  },
+  { 
+    q: "PM Narendra Modi's flagship platform Pariksha Pe Charcha achieved a Guinness World Record for 'the most people registered on a citizen engagement platform in one month.' What is the number of valid registrations?",
+    options: ["1.5 crore", "2.75 crore", "3.53 crore", "4.20 crore", "5 crore"],
+    answer: "3.53 crore",
+    explanation: "The initiative, launched in collaboration with MyGov, achieved 3.53 crore valid registrations, setting a Guinness World Record for citizen engagement.",
+    reference: "The Ministry of Education, in collaboration with MyGov, recorded a staggering 3.53 crore (35.3 million) valid registrations from students, teachers, and parents within a one-month period for its 2024 edition. This massive participation earned the initiative an official Guinness World Record, highlighting its unprecedented reach and impact.",
+    related: "Other educational initiatives include the National Education Policy 2020, Digital India campaign, and SWAYAM online learning platform."
+  },
+  { 
+    q: "At the 70th National Film Awards 2023, which actress won Best Actress and for which movie?",
+    options: ["Deepika Padukone – 'Chhapaak'", "Alia Bhatt – 'Gangubai Kathiawadi'", "Rani Mukherjee – 'Mrs. Chatterjee vs Norway'", "Taapsee Pannu – 'Shabaash Mithu'", "Kiara Advani – 'Bhool Bhulaiyaa 2'"],
+    answer: "Rani Mukherjee – 'Mrs. Chatterjee vs Norway'",
+    explanation: "Rani Mukherjee won Best Actress for Mrs. Chatterjee vs Norway. The Best Actor award went to Shahrukh Khan and Vikrant Massey. Best Feature Film: '12 Fail' directed by Vinod Chopra.",
+    reference: "The film is based on the true story of an Indian family's legal battle against the Norwegian state childcare system. Mukerji's powerful portrayal of a mother's relentless fight for her children was unanimously praised by the jury, earning her this top national honour.",
+    related: "Other National Film Award winners include Allu Arjun for Best Actor for 'Pushpa', 'Rocketry' for Best Feature Film, and 'The Kashmir Files' for Best Film on National Integration."
+  },
+  { 
+    q: "Reliance Industries ranked 88th in the Fortune Global 500 list of 2025. What is its revenue?",
+    options: ["$98.5 billion", "$105.6 billion", "$114.12 billion", "$120.3 billion", "$130 billion"],
+    answer: "$114.12 billion",
+    explanation: "Reliance Industries achieved the 88th spot on the Fortune Global 500 list with a revenue of $114.12 billion USD, reflecting its large-scale industrial operations.",
+    reference: "In the 2024 edition, Reliance Industries Limited (RIL) was ranked 88th, cementing its position as the highest-ranked Indian company on the list. This ranking was based on RIL's massive consolidated revenue of $114.12 billion USD, a testament to its dominant scale across its diversified businesses in oil, petrochemicals, retail (Reliance Retail), and digital services (Jio).",
+    related: "Other Indian companies on the list include Indian Oil Corporation, State Bank of India, and Bharat Petroleum."
+  },
+  { 
+    q: "National Council of Applied Economic Research (NCAER) released the Business Expectation Survey in June 2025, covering 479 companies. What is the value of the Business Confidence Index?",
+    options: ["120.5", "134.2", "149.4", "156.7", "162.1"],
+    answer: "149.4",
+    explanation: "The Business Confidence Index (BCI) recorded by NCAER was 149.4, indicating optimism in business expectations among companies in major Indian cities.",
+    reference: "The NCAER Business Confidence Index is a key indicator of the health of the Indian economy, based on surveys of business leaders across various sectors.",
+    related: "Other economic indicators include GDP growth rate, inflation rate, and the Purchasing Managers' Index (PMI)."
+  },
+  { 
+    q: "Indian Association of Gold Excellence and Standard (IAGES) signed an MoU with which organization to implement a robust accreditation framework for the gold industry?",
+    options: ["SEBI", "RBI", "Institute of Chartered Accountants of India (ICAI)", "BIS", "Ministry of Commerce"],
+    answer: "Institute of Chartered Accountants of India (ICAI)",
+    explanation: "IAGES collaborated with ICAI to implement a robust accreditation and standardization framework for value chain partners in the gold industry.",
+    reference: "This partnership aims to enhance transparency, quality standards, and consumer trust in the gold industry through standardized practices and certification.",
+    related: "Other industry standards include Hallmarking for gold jewelry, BIS certification for various products, and FSSAI standards for food products."
+  },
+  { 
+    q: "Which joint venture in India issued unlisted non-convertible debentures worth ₹9,000 crore?",
+    options: ["GMR Hyderabad International Airport", "BIAL (Bangalore International Airport Limited)", "Adani Airports", "Delhi International Airport Ltd", "Mumbai International Airport Pvt. Ltd"],
+    answer: "BIAL (Bangalore International Airport Limited)",
+    explanation: "BIAL issued unlisted non-convertible debentures worth ₹9,000 crore to fund expansion and operations.",
+    reference: "The funds raised through these debentures will be used for the airport's expansion plans, including the construction of a new terminal and runway to handle increasing passenger traffic.",
+    related: "Other major infrastructure financing includes metro rail projects, highway construction, and port development projects."
+  },
+  { 
+    q: "Google is building a $6 billion data center in which Indian city?",
+    options: ["Hyderabad", "Bengaluru", "Visakhapatnam", "Pune", "Chennai"],
+    answer: "Visakhapatnam",
+    explanation: "Google is investing $6 billion to construct a data center in Visakhapatnam, boosting cloud infrastructure and digital services in India.",
+    reference: "This investment is part of Google's larger plan to expand its cloud infrastructure in India and support the country's growing digital economy.",
+    related: "Other major tech investments in India include Amazon's data centers, Microsoft's cloud regions, and Apple's manufacturing facilities."
+  },
+  { 
+    q: "Which bank introduced the first-ever lock FD feature to prevent term deposits from being broken digitally?",
+    options: ["State Bank of India", "ICICI Bank", "HDFC Bank", "Axis Bank", "Bank of Baroda"],
+    answer: "Axis Bank",
+    explanation: "Axis Bank launched the Lock FD feature to provide customers enhanced control over term deposits and prevent premature digital withdrawals.",
+    reference: "This innovative feature allows customers to lock their fixed deposits for a specified period, preventing early withdrawal even through digital channels, thus helping customers maintain their savings goals.",
+    related: "Other banking innovations include digital lending platforms, UPI-based payments, and AI-powered customer service."
+  },
+  { 
+    q: "Bank of Baroda launched Bob FxOne for corporate and MSME customers. What is its function?",
+    options: ["Loan management system", "Digital forex platform for treasury operations", "Investment advisory tool", "Retail banking app", "Insurance portal"],
+    answer: "Digital forex platform for treasury operations",
+    explanation: "Bob FxOne is a digital forex platform designed to digitize treasury operations and simplify forex dealing for corporate and MSME customers.",
+    reference: "The platform provides real-time exchange rates, automated documentation, and seamless integration with corporate banking services. It aims to simplify foreign exchange operations for businesses and enhance their international trade capabilities.",
+    related: "Other digital banking initiatives include Yono by SBI, iMobile by ICICI Bank, and various UPI-based payment solutions."
+  },
+  { 
+    q: "RBI announced three consumer-friendly schemes to drive financial inclusion. Which of the following schemes was announced?",
+    options: ["Simplified REYC Pro features", "Streamlined claims for deceased account holders", "Enhanced features on the Retail Direct platform for G-Secs", "All of the above", "None of the above"],
+    answer: "All of the above",
+    explanation: "RBI introduced all three initiatives to enhance financial inclusion, simplify banking processes, and improve user experience for investors and consumers.",
+    reference: "These initiatives are part of RBI's broader efforts to make banking more accessible, transparent, and user-friendly for all segments of the population.",
+    related: "Other RBI initiatives include the Account Aggregator framework, UPI innovations, and the Digital Payments Index."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+let marked = new Array(questions.length).fill(false);
+let visited = new Array(questions.length).fill(false);
+let testSubmitted = false;
+let timerInterval;
+let timeLeft = 10*60;
+
+function startTimer() {
+  timerInterval = setInterval(()=>{
+    if(timeLeft<=0){clearInterval(timerInterval); submitTest();}
+    else{
+      timeLeft--;
+      let m=String(Math.floor(timeLeft/60)).padStart(2,'0');
+      let s=String(timeLeft%60).padStart(2,'0');
+      document.getElementById("timer").innerText=`Time Left: ${m}:${s}`;
+    }
+  },1000);
+}
+
+function loadQuestion(i){
+  current = i;
+  visited[i]=true;
+  const q = questions[i];
+  document.getElementById("question").innerText = q.q;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  
+  // Clear answer feedback
+  document.getElementById("answerFeedback").innerHTML = "";
+
+  q.options.forEach(opt => {
+    const label = document.createElement("label");
+    
+    if(testSubmitted) {
+      // After test submission
+      let extraStyle = "";
+      let extraMark = "";
+      let isCorrect = opt === q.answer;
+      let isSelected = answers[i] === opt;
+      
+      if(isSelected && isCorrect) {
+        extraStyle = "color: green; font-weight:bold; background-color: #e6ffe6;";
+        extraMark = " ✅";
+      } else if(isSelected && !isCorrect) {
+        extraStyle = "color: red; font-weight:bold; background-color: #ffe6e6;";
+        extraMark = " ❌";
+      } else if(isCorrect) {
+        extraStyle = "color: green; font-weight:bold; background-color: #e6ffe6;";
+        extraMark = " (Correct Answer)";
+      }
+      
+      label.innerHTML = `<input type="radio" name="option" value="${opt}" ${isSelected?"checked":""} 
+                         ${answers[i] !== null ? "disabled" : "onchange='markAnswerAfterSubmit(this)'"}> 
+                         <span style="${extraStyle}">${opt}${extraMark}</span>`;
+    } else {
+      // During test
+      label.innerHTML = `<input type="radio" name="option" value="${opt}" ${answers[i]===opt?"checked":""}> ${opt}`;
+      label.querySelector("input").addEventListener("change", (e)=>{
+        answers[i] = e.target.value;
+        updatePalette();
+      });
+    }
+    optionsDiv.appendChild(label);
+  });
+  
+  // Show answer feedback after submission
+  if(testSubmitted) {
+    showAnswerFeedback(i);
+    showSolution(i);
+  }
+  
+  updatePalette();
+}
+
+function showAnswerFeedback(i) {
+  const feedbackDiv = document.getElementById("answerFeedback");
+  feedbackDiv.innerHTML = "";
+  
+  const q = questions[i];
+  const userAnswer = answers[i];
+  
+  if(userAnswer === null) {
+    feedbackDiv.innerHTML = `<div class="unanswered">
+      <strong>You did not answer this question.</strong> The correct answer is: ${q.answer}
+    </div>`;
+  } else if(userAnswer === q.answer) {
+    feedbackDiv.innerHTML = `<div class="correct-answer">
+      <strong>Correct!</strong> Your answer is right.
+    </div>`;
+  } else {
+    feedbackDiv.innerHTML = `<div class="incorrect-answer">
+      <strong>Incorrect.</strong> Your answer: ${userAnswer}<br>
+      <strong>Correct answer:</strong> ${q.answer}
+    </div>`;
+  }
+}
+
+function showSolution(i) {
+  const q = questions[i];
+  document.getElementById("solutionTabs").style.display = "flex";
+  document.getElementById("solutionContent").style.display = "block";
+  
+  // Set active tab
+  showTab('answerExplanation');
+  
+  // Update tab content based on current question
+  document.getElementById("answerExplanationContent").innerHTML = `
+    <div class="solution">
+      <h4>Detailed Explanation:</h4>
+      <div class="solution-content">${q.explanation}</div>
+    </div>
+  `;
+  
+  document.getElementById("referenceMaterialContent").innerHTML = `
+    <div class="solution">
+      <h4>Reference Material:</h4>
+      <div class="solution-content">${q.reference}</div>
+    </div>
+  `;
+  
+  document.getElementById("relatedQuestionsContent").innerHTML = `
+    <div class="solution">
+      <h4>Related Knowledge:</h4>
+      <div class="solution-content">${q.related}</div>
+    </div>
+  `;
+}
+
+function showTab(tabName) {
+  // Hide all tab contents
+  document.getElementById("answerExplanationContent").style.display = 'none';
+  document.getElementById("referenceMaterialContent").style.display = 'none';
+  document.getElementById("relatedQuestionsContent").style.display = 'none';
+  
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  // Show selected tab and set active class
+  document.getElementById(tabName + 'Content').style.display = 'block';
+  event.currentTarget.classList.add('active');
+}
+
+function markAnswerAfterSubmit(radio) {
+  answers[current] = radio.value;
+  updatePalette();
+  showAnswerFeedback(current);
+  
+  // Update score in real-time
+  if(testSubmitted) {
+    let score = calculateScore();
+    document.getElementById("scorecard").innerText = `Your Score: ${score.toFixed(2)}`;
+  }
+}
+
+function calculateScore() {
+  let score = 0;
+  answers.forEach((ans, i) => {
+    if(ans !== null) {
+      if(ans === questions[i].answer) {
+        score += 1;
+      } else {
+        score -= 0.25;
+      }
+    }
+  });
+  return score;
+}
+
+function saveAndNext(){
+  const selected = document.querySelector("input[name='option']:checked");
+  if(selected) answers[current] = selected.value;
+
+  if(current < questions.length - 1){
+    current++;
+    loadQuestion(current);
+  } else {
+    // If it's the last question, go to the first one
+    current = 0;
+    loadQuestion(current);
+  }
+}
+
+function previousQuestion(){ 
+  if(current > 0){
+    current--;
+    loadQuestion(current);
+  }
+}
+
+function markForReview(){ 
+  marked[current] = true; 
+  if(current < questions.length - 1){
+    current++;
+    loadQuestion(current);
+  } else {
+    current = 0;
+    loadQuestion(current);
+  }
+}
+
+function clearResponse(){ 
+  answers[current] = null; 
+  const radios = document.querySelectorAll("input[name='option']");
+  radios.forEach(radio => radio.checked = false);
+  updatePalette();
+  
+  // Update feedback if test is submitted
+  if(testSubmitted) {
+    showAnswerFeedback(current);
+    let score = calculateScore();
+    document.getElementById("scorecard").innerText = `Your Score: ${score.toFixed(2)}`;
+  }
+}
+
+function updatePalette(){
+  const div = document.getElementById("paletteButtons");
+  div.innerHTML = "";
+  
+  questions.forEach((q, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = i + 1;
+    
+    // Remove all classes first
+    btn.classList.remove("current", "answered", "review", "visited");
+    
+    // Add appropriate class based on state
+    if(i === current) {
+      btn.classList.add("current");
+    } else if(answers[i] !== null) {
+      btn.classList.add("answered");
+    } else if(marked[i]) {
+      btn.classList.add("review");
+    } else if(visited[i]) {
+      btn.classList.add("visited");
+    }
+    
+    btn.onclick = () => {
+      current = i;
+      loadQuestion(i);
+    };
+    div.appendChild(btn);
+  });
+}
+
+function submitTest(){
+  if(!testSubmitted && confirm("Are you sure you want to submit the test?")) {
+    clearInterval(timerInterval);
+    testSubmitted = true;
+    
+    let score = calculateScore();
+    
+    document.getElementById("scorecard").style.display = "block";
+    document.getElementById("scorecard").innerText = `Your Score: ${score.toFixed(2)}`;
+    document.getElementById("submitBtn").style.display = "none";
+    
+    // Change navigation buttons for review mode
+    document.getElementById("reviewBtn").style.display = "none";
+    document.getElementById("clearBtn").innerText = "Clear Answer";
+    
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.innerText = "Next";
+    nextBtn.onclick = nextQuestion;
+    
+    const prevBtn = document.getElementById("prevBtn");
+    prevBtn.onclick = previousQuestion;
+    
+    loadQuestion(current);
+    updatePalette();
+  }
+}
+
+function nextQuestion() {
+  if(current < questions.length - 1) {
+    current++;
+    loadQuestion(current);
+  }
+}
+
+// Initialize the test
+loadQuestion(current);
+updatePalette();
+startTimer();
+
+// Create tab content containers
+const solutionContent = document.getElementById("solutionContent");
+solutionContent.innerHTML = `
+  <div id="answerExplanationContent" class="tab-content"></div>
+  <div id="referenceMaterialContent" class="tab-content" style="display: none;"></div>
+  <div id="relatedQuestionsContent" class="tab-content" style="display: none;"></div>
+`;
+</script>
+</body>
+</html>
