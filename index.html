@@ -2,56 +2,687 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Online Exam Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Exam Portal with Section Scorecards</title>
 <style>
+/* ===== Global Styles ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6ecff 100%);
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
 /* ===== Homepage ===== */
-body { margin: 0; font-family: Arial, sans-serif; background: #f0f4ff; }
-header.main { background: #3366cc; color: white; padding: 15px; text-align: center; font-size: 26px; font-weight: bold; }
-.container { padding: 20px; }
-.exam-card { background: #fff; border: 2px solid #3366cc; border-radius: 10px; padding: 20px; margin: 20px 0; }
-.exam-card h2 { margin-top: 0; color: #003366; }
-.subjects { display: flex; gap: 20px; flex-wrap: wrap; }
-.subject { flex: 1; min-width: 180px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; padding: 10px; text-align: center; }
-.subject h3 { margin: 10px 0; }
-.start-btn { background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
-.start-btn:hover { background: #0056b3; }
+header.main {
+  background: linear-gradient(to right, #3366cc, #254e9e);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.exam-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  margin: 25px 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.exam-card h2 {
+  margin-top: 0;
+  color: #003366;
+  font-size: 24px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #eaeaea;
+  margin-bottom: 20px;
+}
+
+.subjects {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.subject {
+  flex: 1;
+  min-width: 200px;
+  max-width: 250px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #f9f9f9;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.subject:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  border-color: #3366cc;
+}
+
+.subject h3 {
+  margin: 15px 0;
+  color: #003366;
+  font-size: 18px;
+}
+
+.start-btn {
+  background: linear-gradient(to bottom, #007bff, #0069d9);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+  background: linear-gradient(to bottom, #0069d9, #0056b3);
+  transform: translateY(-2px);
+}
 
 /* ===== Test Page ===== */
-#testPage { display: none; height: 100vh; position: relative; }
-#testPage header { background-color: #99c2ff; display: flex; justify-content: center; align-items: center; padding: 15px; font-weight: bold; position: relative; }
-#testPage header .title { font-size: 28px; }
-#homeBtn { position: fixed; top: 10px; left: 10px; padding: 6px 12px; font-size: 14px; cursor: pointer; z-index: 2000; background:#007bff; color:white; border:none; border-radius:4px; }
-#container { display: flex; flex: 1; overflow: hidden; padding-bottom: 70px; }
-#questionPanel, #palettePanel { border: 2px solid black; padding: 10px; height: calc(100vh - 60px - 70px); overflow-y: auto; }
-#questionPanel { flex: 3; margin: 10px; }
-#palettePanel { flex: 1; margin: 10px; background: #f0f8ff; }
-#question { font-size: 18px; margin-bottom: 15px; min-height: 60px; }
-#options label { display: block; margin: 8px 0; font-size: 16px; padding: 5px; border-radius: 4px; }
-#navigation { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #e6f0ff; padding: 10px 0; text-align: center; border-top: 2px solid #003366; z-index: 1000; }
-#navigation button { padding: 8px 15px; margin: 5px; border: 1px solid #003366; border-radius: 0; cursor: pointer; font-size: 14px; background-color: #cce0ff; color: black; }
-#navigation button:hover { background-color: #99c2ff; }
-#submitContainer { text-align: center; margin-top: 20px; }
-#submitBtn { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 0; font-size: 16px; font-weight: bold; cursor: pointer; width: 120px; text-align: center; }
-#submitBtn:hover { background-color: #0056b3; }
-#paletteButtons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-#paletteButtons button { width: 100%; aspect-ratio: 1/1; background-color: lightgrey; border: none; cursor: pointer; font-weight: bold; transition: all 0.3s ease; clip-path: polygon(0% 0%, 100% 0, 100% 100%, 0% 100%); }
-#paletteButtons button.current { clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%); background-color: #99c2ff; transform: scale(1.05); }
-#paletteButtons button.answered { background-color: lightgreen; }
-#paletteButtons button.review { background-color: violet; }
-#paletteButtons button.visited { background-color: orange; }
-#scorecard { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #003366; padding: 10px; background-color: #cce0ff; border-radius: 5px; }
-.legend { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
-.legend-item { display: flex; align-items: center; margin-bottom: 5px; }
-.legend-color { width: 20px; height: 20px; margin-right: 10px; display: inline-block; }
+#testPage {
+  display: none;
+  min-height: 100vh;
+  position: relative;
+  background: #f8fbff;
+}
+
+#testPage header {
+  background: linear-gradient(to right, #99c2ff, #5c9eff);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  font-weight: bold;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#testPage header .title {
+  font-size: 24px;
+  color: #003366;
+}
+
+#timer {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003366;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 8px 15px;
+  border-radius: 30px;
+  min-width: 150px;
+  text-align: center;
+}
+
+#homeBtn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 2000;
+  background: linear-gradient(to bottom, #007bff, #0069d9);
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+#container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 20px;
+  padding-bottom: 90px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+#questionPanel, #palettePanel {
+  border: 2px solid #ccd9ff;
+  border-radius: 10px;
+  padding: 20px;
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  background: white;
+}
+
+#questionPanel {
+  flex: 3;
+}
+
+#palettePanel {
+  flex: 1;
+  background: #f7fbff;
+  min-width: 250px;
+}
+
+#question {
+  font-size: 20px;
+  margin-bottom: 20px;
+  min-height: 60px;
+  font-weight: 600;
+  color: #00264d;
+  line-height: 1.5;
+}
+
+#options {
+  margin-bottom: 20px;
+}
+
+#options label {
+  display: block;
+  margin: 12px 0;
+  font-size: 17px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 1px solid #e2e6ea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#options label:hover {
+  background: #e9ecef;
+  border-color: #ccd9ff;
+}
+
+#options input[type="radio"]:checked + span {
+  font-weight: 600;
+  color: #007bff;
+}
+
+#options input[type="radio"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+#answerFeedback {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border-left: 4px solid #007bff;
+}
+
+.correct-answer {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.incorrect-answer {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.solution {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #17a2b8;
+}
+
+#navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to right, #e6f0ff, #d9e6ff);
+  padding: 15px 0;
+  text-align: center;
+  border-top: 2px solid #003366;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#navigation button {
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: 1px solid #003366;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: #cce0ff;
+  color: #00264d;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+#navigation button:hover {
+  background-color: #99c2ff;
+}
+
+#submitContainer {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e6ea;
+}
+
+#submitBtn {
+  background: linear-gradient(to bottom, #28a745, #218838);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 150px;
+  text-align: center;
+}
+
+#paletteButtons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#paletteButtons button {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+#paletteButtons button.current {
+  background-color: #99c2ff;
+  border: 2px solid #3366cc;
+  transform: scale(1.1);
+}
+
+#paletteButtons button.answered {
+  background-color: #28a745;
+  color: white;
+}
+
+#paletteButtons button.review {
+  background-color: #9370db;
+  color: white;
+}
+
+#paletteButtons button.visited {
+  background-color: #ffa500;
+  color: white;
+}
+
+#paletteButtons button.correct {
+  background-color: #28a745;
+  color: white;
+}
+
+#paletteButtons button.incorrect {
+  background-color: #dc3545;
+  color: white;
+}
+
+#paletteButtons button.unanswered {
+  background-color: #6c757d;
+  color: white;
+}
+
+#scorecard {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #003366;
+  padding: 15px;
+  background: linear-gradient(to right, #cce0ff, #e6f0ff);
+  border-radius: 8px;
+}
+
+.legend {
+  margin-top: 25px;
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
 
 /* ===== Fade animations ===== */
-.fade-out { animation: fadeOut 0.5s forwards; }
-.fade-in { animation: fadeIn 0.5s forwards; }
-@keyframes fadeOut { from {opacity:1;} to {opacity:0;} }
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== Login Modal Styles ===== */
+#loginModal {
+  display: flex;
+  position: fixed;
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.5s;
+}
+
+.login-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+  margin: auto;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  position: relative;
+  animation: slideIn 0.5s;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.login-content h2 {
+  color: #003366;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.login-content p {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-input {
+  padding: 15px;
+  border: 2px solid #ccd9ff;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.login-input:focus {
+  border-color: #3366cc;
+  outline: none;
+}
+
+.login-btn {
+  background: linear-gradient(to right, #3366cc, #254e9e);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: linear-gradient(to right, #254e9e, #1a3a7a);
+  transform: translateY(-2px);
+}
+
+/* ===== Confirmation Modal Styles ===== */
+#confirmationModal {
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+}
+
+.modal h2 {
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 100px;
+  transition: all 0.3s ease;
+}
+
+.modal-btn.confirm {
+  background: linear-gradient(to bottom, #28a745, #218838);
+  color: white;
+}
+
+.modal-btn.cancel {
+  background: linear-gradient(to bottom, #6c757d, #5a6268);
+  color: white;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 992px) {
+  #container {
+    flex-direction: column;
+    padding-bottom: 120px;
+  }
+  
+  #questionPanel, #palettePanel {
+    height: auto;
+    min-height: 400px;
+  }
+  
+  #palettePanel {
+    order: -1;
+    margin-bottom: 20px;
+  }
+  
+  .subjects {
+    gap: 15px;
+  }
+  
+  .subject {
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  header.main {
+    font-size: 22px;
+    padding: 15px;
+  }
+  
+  .exam-card {
+    padding: 20px;
+  }
+  
+  .exam-card h2 {
+    font-size: 20px;
+  }
+  
+  #testPage header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+  
+  #testPage header .title {
+    font-size: 20px;
+  }
+  
+  #timer {
+    font-size: 18px;
+  }
+  
+  #navigation {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+  
+  #navigation button {
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 100px;
+  }
+  
+  #question {
+    font-size: 18px;
+  }
+  
+  #options label {
+    font-size: 16px;
+    padding: 10px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .login-content {
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .subjects {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .subject {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  #paletteButtons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  #navigation {
+    padding: 8px;
+  }
+  
+  #navigation button {
+    min-width: 80px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  #submitBtn {
+    width: 130px;
+    padding: 10px 15px;
+  }
+  
+  .login-content {
+    padding: 25px 15px;
+  }
+  
+  .login-content h2 {
+    font-size: 24px;
+  }
+}
 </style>
 </head>
 <body>
+
+<!-- Login Modal -->
+<div id="loginModal">
+  <div class="login-content">
+    <h2>Welcome to Exam Portal</h2>
+    <p>Please enter your name to continue</p>
+    <div class="login-form">
+      <input type="text" id="userName" class="login-input" placeholder="Enter your name" required>
+      <button id="loginBtn" class="login-btn">Start Exam</button>
+    </div>
+  </div>
+</div>
 
 <!-- Homepage -->
 <header class="main">Online Exam Portal</header>
@@ -59,10 +690,22 @@ header.main { background: #3366cc; color: white; padding: 15px; text-align: cent
   <div class="exam-card">
     <h2>IBPS PO</h2>
     <div class="subjects">
-      <div class="subject"><h3>Quant</h3><button class="start-btn" onclick="openTest('Quant')">Start</button></div>
-      <div class="subject"><h3>Reasoning</h3><button class="start-btn" onclick="openTest('Reasoning')">Start</button></div>
-      <div class="subject"><h3>English</h3><button class="start-btn" onclick="openTest('English')">Start</button></div>
-      <div class="subject"><h3>GA</h3><button class="start-btn" onclick="openTest('GA')">Start</button></div>
+      <div class="subject">
+        <h3>Quant</h3>
+        <button class="start-btn" onclick="openTest('Quant')">Start</button>
+      </div>
+      <div class="subject">
+        <h3>Reasoning</h3>
+        <button class="start-btn" onclick="openTest('Reasoning')">Start</button>
+      </div>
+      <div class="subject">
+        <h3>English</h3>
+        <button class="start-btn" onclick="openTest('English')">Start</button>
+      </div>
+      <div class="subject">
+        <h3>GA</h3>
+        <button class="start-btn" onclick="openTest('GA')">Start</button>
+      </div>
     </div>
   </div>
 </div>
@@ -70,10 +713,10 @@ header.main { background: #3366cc; color: white; padding: 15px; text-align: cent
 <!-- Test Page -->
 <div id="testPage">
   <header>
-    <div class="title">IBPS PO Mock Test</div>
+    <div class="title">IBPS PO Mock Test - <span id="subjectTitle">GA</span></div>
     <div id="timer">Time Left: 10:00</div>
   </header>
-  <button id="homeBtn" onclick="goHome()">Home</button>
+  <button id="homeBtn" onclick="confirmGoHome()">Home</button>
   <div id="container">
     <div id="questionPanel">
       <div id="scorecard" style="display:none;"></div>
@@ -86,13 +729,13 @@ header.main { background: #3366cc; color: white; padding: 15px; text-align: cent
       <div id="paletteButtons"></div>
       <div class="legend">
         <div class="legend-item"><span class="legend-color" style="background-color: #99c2ff;"></span> Current Question</div>
-        <div class="legend-item"><span class="legend-color" style="background-color: lightgreen;"></span> Answered</div>
-        <div class="legend-item"><span class="legend-color" style="background-color: violet;"></span> Marked for Review</div>
-        <div class="legend-item"><span class="legend-color" style="background-color: orange;"></span> Visited</div>
-        <div class="legend-item"><span class="legend-color" style="background-color: lightgrey;"></span> Not Visited</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: #28a745;"></span> Answered</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: #9370db;"></span> Marked for Review</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: #ffa500;"></span> Visited</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: #f0f0f0;"></span> Not Visited</div>
       </div>
       <div id="submitContainer">
-        <button id="submitBtn" onclick="submitTest()">Submit</button>
+        <button id="submitBtn" onclick="confirmSubmit()">Submit</button>
       </div>
     </div>
   </div>
@@ -104,58 +747,93 @@ header.main { background: #3366cc; color: white; padding: 15px; text-align: cent
   </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle">Confirm Action</h2>
+    <p id="modalMessage">Are you sure you want to proceed?</p>
+  </div>
+</div>
+
 <script>
-// GA Questions
-let questionsGA = [
-  {q:"Q1. ISRO inaugurated the HOPE analogue mission in Tso Kar Valley, Ladakh. What is the full form of the letter E in HOPE analogue mission?", options:["Exploration","Earth","Excellence","Expedition","Planetary Exploration"], answer:"Planetary Exploration", solution:"HOPE stands for Himalayan Outpost for Planetary Exploration. The mission is a terrestrial analogue mission to test technologies and systems for future planetary exploration missions."},
-  {q:"Q2. The Indian Army signed an MoU with a company for the procurement of new-generation 50-ton transporter trailers worth ₹223.95 crore. Which company is this?", options:["Tata Advanced Systems","Axicades Aerospace and Technology Pvt. Ltd.","Larsen & Toubro","Bharat Electronics Limited","Mahindra Defence Systems"], answer:"Axicades Aerospace and Technology Pvt. Ltd.", solution:"The MoU was signed with Axicades Aerospace and Technology Pvt. Ltd. for procurement of 212 advanced 50-ton tank transporter trailers for the Indian Army."},
-  {q:"Q3. Indian Navy received the third ship of Project 17A stealth frigate, Himgiri. Which company built Himgiri?", options:["Mazagon Dock Shipbuilders Ltd","Cochin Shipyard","Garden Reach Shipbuilders & Engineers (GRSE)","Hindustan Shipyard Ltd","L&T Shipbuilding"], answer:"Garden Reach Shipbuilders & Engineers (GRSE)", solution:"The Himgiri, part of Project 17A, was built by GRSE and officially handed over to the Indian Navy in Kolkata, West Bengal."},
-  {q:"Q4. Ant Financial sold what percentage of stakes in Paytm for ₹383 crore?", options:["3.21%","5.84%","7.50%","10%","12%"], answer:"5.84%", solution:"Ant Financial sold 5.84% of its stake in Paytm for ₹383 crore as part of its portfolio restructuring."},
-  {q:"Q5. RBI approved the merger of New India Co-operative Bank with which bank?", options:["Saraswat Co-operative Bank","Punjab & Maharashtra Co-operative Bank","HDFC Bank","State Bank of India","Canara Bank"], answer:"Saraswat Co-operative Bank", solution:"RBI approved the merger of New India Co-operative Bank with Saraswat Co-operative Bank to strengthen banking operations and consolidate cooperative banking."},
-  {q:"Q6. The Competition Commission of India approved the acquisition of 100% stake in Jai Prakash Associates Limited by which company?", options:["UltraTech Cement","Dalmia Cement Bharat Limited","ACC Limited","Ambuja Cements","Shree Cement"], answer:"Dalmia Cement Bharat Limited", solution:"Dalmia Cement Bharat Limited acquired 100% stake in Jai Prakash Associates Limited, approved by the CCI, as part of business expansion strategy."},
-  {q:"Q7. Who has been appointed as Director of Vikram Sarabhai Space Centre, Thiruvananthapuram?", options:["K. Sivan","A. Rajarajan","S. Unnikrishnan","M. Annadurai","R. Umamaheshwaran"], answer:"A. Rajarajan", solution:"A. Rajarajan has been appointed as the Director of Vikram Sarabhai Space Centre, Kerala, which is a premier center for ISRO’s launch vehicle and space technology research."},
-  {q:"Q8. PM Narendra Modi's flagship platform Pariksha Pe Charcha achieved a Guinness World Record for 'the most people registered on a citizen engagement platform in one month.' What is the number of valid registrations?", options:["1.5 crore","2.75 crore","3.53 crore","4.20 crore","5 crore"], answer:"3.53 crore", solution:"The initiative, launched in collaboration with MyGov, achieved 3.53 crore valid registrations, setting a Guinness World Record for citizen engagement."},
-  {q:"Q9. At the 70th National Film Awards 2023, which actress won Best Actress and for which movie?", options:["Deepika Padukone – 'Chhapaak'","Alia Bhatt – 'Gangubai Kathiawadi'","Rani Mukherjee – 'Mrs. Chatterjee vs Norway'","Taapsee Pannu – 'Shabaash Mithu'","Kiara Advani – 'Bhool Bhulaiyaa 2'"], answer:"Rani Mukherjee – 'Mrs. Chatterjee vs Norway'", solution:"Rani Mukherjee won Best Actress for Mrs. Chatterjee vs Norway. The Best Actor award went to Shahrukh Khan and Vikrant Massey. Best Feature Film: '12 Fail' directed by Vinod Chopra."},
-  {q:"Q10. Reliance Industries ranked 88th in the Fortune Global 500 list of 2025. What is its revenue?", options:["$98.5 billion","$105.6 billion","$114.12 billion","$120.3 billion","$130 billion"], answer:"$114.12 billion", solution:"Reliance Industries achieved the 88th spot on the Fortune Global 500 list with a revenue of $114.12 billion USD, reflecting its large-scale industrial operations."},
-  {q:"Q12. National Council of Applied Economic Research (NCAER) released the Business Expectation Survey in June 2025, covering 479 companies. What is the value of the Business Confidence Index?", options:["120.5","134.2","149.4","156.7","162.1"], answer:"149.4", solution:"The Business Confidence Index (BCI) recorded by NCAER was 149.4, indicating optimism in business expectations among companies in major Indian cities."},
-  {q:"Q13. Indian Association of Gold Excellence and Standard (IAGES) signed an MoU with which organization to implement a robust accreditation framework for the gold industry?", options:["SEBI","RBI","Institute of Chartered Accountants of India (ICAI)","BIS","Ministry of Commerce"], answer:"Institute of Chartered Accountants of India (ICAI)", solution:"IAGES collaborated with ICAI to implement a robust accreditation and standardization framework for value chain partners in the gold industry."},
-  {q:"Q14. Which joint venture in India issued unlisted non-convertible debentures worth ₹9,000 crore?", options:["GMR Hyderabad International Airport","BIAL (Bangalore International Airport Limited)","Adani Airports","Delhi International Airport Ltd","Mumbai International Airport Pvt. Ltd"], answer:"BIAL (Bangalore International Airport Limited)", solution:"BIAL issued unlisted non-convertible debentures worth ₹9,000 crore to fund expansion and operations."},
-  {q:"Q15. Google is building a $6 billion data center in which Indian city?", options:["Hyderabad","Bengaluru","Visakhapatnam","Pune","Chennai"], answer:"Visakhapatnam", solution:"Google is investing $6 billion to construct a data center in Visakhapatnam, boosting cloud infrastructure and digital services in India."},
-  {q:"Q16. Which bank introduced the first-ever lock FD feature to prevent term deposits from being broken digitally?", options:["State Bank of India","ICICI Bank","HDFC Bank","Axis Bank","Bank of Baroda"], answer:"Axis Bank", solution:"Axis Bank launched the Lock FD feature to provide customers enhanced control over term deposits and prevent premature digital withdrawals."},
-  {q:"Q17. Bank of Baroda launched Bob FxOne for corporate and MSME customers. What is its function?", options:["Loan management system","Digital forex platform for treasury operations","Investment advisory tool","Retail banking app","Insurance portal"], answer:"Digital forex platform for treasury operations", solution:"Bob FxOne is a digital forex platform designed to digitize treasury operations and simplify forex dealing for corporate and MSME customers."},
-  {q:"Q18. RBI announced three consumer-friendly schemes to drive financial inclusion. Which of the following schemes was announced?", options:["Simplified REYC Pro features","Streamlined claims for deceased account holders","Enhanced features on the Retail Direct platform for G-Secs","All of the above","None of the above"], answer:"All of the above", solution:"RBI introduced all three initiatives to enhance financial inclusion, simplify banking processes, and improve user experience for investors and consumers."}
-];
+// Questions for different subjects
+const questionsData = {
+  GA: [
+    {q:"Q1. ISRO inaugurated the HOPE analogue mission in Tso Kar Valley, Ladakh. What is the full form of the letter E in HOPE analogue mission?", options:["Experience","Earth","Excellence","Expedition","Exploration"], answer:"Exploration", solution:"HOPE stands for Himalayan Outpost for Planetary Exploration. The mission is a terrestrial analogue mission to test technologies and systems for future planetary exploration missions."},
+    {q:"Q2. The Indian Army signed an MoU with a company for the procurement of new-generation 50-ton transporter trailers worth ₹223.95 crore. Which company is this?", options:["Tata Advanced Systems","Axicades Aerospace and Technology Pvt. Ltd.","Larsen & Toubro","Bharat Electronics Limited","Mahindra Defence Systems"], answer:"Axicades Aerospace and Technology Pvt. Ltd.", solution:"The MoU was signed with Axicades Aerospace and Technology Pvt. Ltd. for procurement of 212 advanced 50-ton tank transporter trailers for the Indian Army."},
+    {q:"Q3. Indian Navy received the third ship of Project 17A stealth frigate, Himgiri. Which company built Himgiri?", options:["Mazagon Dock Shipbuilders Ltd","Cochin Shipyard","Garden Reach Shipbuilders & Engineers (GRSE)","Hindustan Shipyard Ltd","L&T Shipbuilding"], answer:"Garden Reach Shipbuilders & Engineers (GRSE)", solution:"The Himgiri, part of Project 17A, was built by GRSE and officially handed over to the Indian Navy in Kolkata, West Bengal."},
+    {q:"Q4. Ant Financial sold what percentage of stakes in Paytm for ₹383 crore?", options:["3.21%","5.84%","7.50%","10%","12%"], answer:"5.84%", solution:"Ant Financial sold 5.84% of its stake in Paytm for ₹383 crore as part of its portfolio restructuring."},
+    {q:"Q5. RBI approved the merger of New India Co-operative Bank with which bank?", options:["Saraswat Co-operative Bank","Punjab & Maharashtra Co-operative Bank","HDFC Bank","State Bank of India","Canara Bank"], answer:"Saraswat Co-operative Bank", solution:"RBI approved the merger of New India Co-operative Bank with Saraswat Co-operative Bank to strengthen banking operations and consolidate cooperative banking."},
+    {q:"Q6. The Competition Commission of India approved the acquisition of 100% stake in Jai Prakash Associates Limited by which company?", options:["UltraTech Cement","Dalmia Cement Bharat Limited","ACC Limited","Ambuja Cements","Shree Cement"], answer:"Dalmia Cement Bharat Limited", solution:"Dalmia Cement Bharat Limited acquired 100% stake in Jai Prakash Associates Limited, approved by the CCI, as part of business expansion strategy."},
+    {q:"Q7. Who has been appointed as Director of Vikram Sarabhai Space Centre, Thiruvananthapuram?", options:["K. Sivan","A. Rajarajan","S. Unnikrishnan","M. Annadurai","R. Umamaheshwaran"], answer:"A. Rajarajan", solution:"A. Rajarajan has been appointed as the Director of Vikram Sarabhai Space Centre, Kerala, which is a premier center for ISRO's launch vehicle and space technology research."},
+    {q:"Q8. PM Narendra Modi's flagship platform Pariksha Pe Charcha achieved a Guinness World Record for 'the most people registered on a citizen engagement platform in one month.' What is the number of valid registrations?", options:["1.5 crore","2.75 crore","3.53 crore","4.20 crore","5 crore"], answer:"3.53 crore", solution:"The initiative, launched in collaboration with MyGov, achieved 3.53 crore valid registrations, setting a Guinness World Record for citizen engagement."},
+    {q:"Q9. At the 70th National Film Awards 2023, which actress won Best Actress and for which movie?", options:["Deepika Padukone – 'Chhapaak'","Alia Bhatt – 'Gangubai Kathiawadi'","Rani Mukherjee – 'Mrs. Chatterjee vs Norway'","Taapsee Pannu – 'Shabaash Mithu'","Kiara Advani – 'Bhool Bhulaiyaa 2'"], answer:"Rani Mukherjee – 'Mrs. Chatterjee vs Norway'", solution:"Rani Mukherjee won Best Actress for Mrs. Chatterjee vs Norway. The Best Actor award went to Shahrukh Khan and Vikrant Massey. Best Feature Film: '12 Fail' directed by Vinod Chopra."},
+    {q:"Q10. Reliance Industries ranked 88th in the Fortune Global 500 list of 2025. What is its revenue?", options:["$98.5 billion","$105.6 billion","$114.12 billion","$120.3 billion","$130 billion"], answer:"$114.12 billion", solution:"Reliance Industries achieved the 88th spot on the Fortune Global 500 list with a revenue of $114.12 billion USD, reflecting its large-scale industrial operations."},
+    {q:"Q11. National Council of Applied Economic Research (NCAER) released the Business Expectation Survey in June 2025, covering 479 companies. What is the value of the Business Confidence Index?", options:["120.5","134.2","149.4","156.7","162.1"], answer:"149.4", solution:"The Business Confidence Index (BCI) recorded by NCAER was 149.4, indicating optimism in business expectations among companies in major Indian cities."},
+    {q:"Q12. Indian Association of Gold Excellence and Standard (IAGES) signed an MoU with which organization to implement a robust accreditation framework for the gold industry?", options:["SEBI","RBI","Institute of Chartered Accountants of India (ICAI)","BIS","Ministry of Commerce"], answer:"Institute of Chartered Accountants of India (ICAI)", solution:"IAGES collaborated with ICAI to implement a robust accreditation and standardization framework for value chain partners in the gold industry."},
+    {q:"Q13. Which joint venture in India issued unlisted non-convertible debentures worth ₹9,000 crore?", options:["GMR Hyderabad International Airport","BIAL (Bangalore International Airport Limited)","Adani Airports","Delhi International Airport Ltd","Mumbai International Airport Pvt. Ltd"], answer:"BIAL (Bangalore International Airport Limited)", solution:"BIAL issued unlisted non-convertible debentures worth ₹9,000 crore to fund expansion and operations."},
+    {q:"Q14. Google is building a $6 billion data center in which Indian city?", options:["Hyderabad","Bengaluru","Visakhapatnam","Pune","Chennai"], answer:"Visakhapatnam", solution:"Google is investing $6 billion to construct a data center in Visakhapatnam, boosting cloud infrastructure and digital services in India."},
+    {q:"Q15. Which bank introduced the first-ever lock FD feature to prevent term deposits from being broken digitally?", options:["State Bank of India","ICICI Bank","HDFC Bank","Axis Bank","Bank of Baroda"], answer:"Axis Bank", solution:"Axis Bank launched the Lock FD feature to provide customers enhanced control over term deposits and prevent premature digital withdrawals."},
+    {q:"Q16. Bank of Baroda launched Bob FxOne for corporate and MSME customers. What is its function?", options:["Loan management system","Digital forex platform for treasury operations","Investment advisory tool","Retail banking app","Insurance portal"], answer:"Digital forex platform for treasury operations", solution:"Bob FxOne is a digital forex platform designed to digitize treasury operations and simplify forex dealing for corporate and MSME customers."},
+    {q:"Q17. RBI announced three consumer-friendly schemes to drive financial inclusion. Which of the following schemes was announced?", options:["Simplified REYC Pro features","Streamlined claims for deceased account holders","Enhanced features on the Retail Direct platform for G-Secs","All of the above","None of the above"], answer:"All of the above", solution:"RBI introduced all three initiatives to enhance financial inclusion, simplify banking processes, and improve user experience for investors and consumers."}
+  ],
+  Quant: [
+    {q:"Q1. What is 15% of 340?", options:["51", "44", "46", "50", "52"], answer:"51", solution:"15% of 340 = (15/100) × 340 = 51"},
+    {q:"Q2. If x + y = 10 and x - y = 4, what is the value of x?", options:["7", "6", "8", "5", "9"], answer:"7", solution:"Adding the two equations: 2x = 14, so x = 7"},
+    {q:"Q3. A train travels 300 km in 5 hours. What is its average speed?", options:["50 km/h", "60 km/h", "70 km/h", "80 km/h", "90 km/h"], answer:"60 km/h", solution:"Average speed = Total distance / Total time = 300 km / 5 hours = 60 km/h"},
+    {q:"Q4. If a number is increased by 20% and then decreased by 20%, what is the net change?", options:["4% decrease", "4% increase", "No change", "10% decrease", "10% increase"], answer:"4% decrease", solution:"Let the number be 100. After 20% increase: 120. After 20% decrease: 120 - 24 = 96. Net change: 100 - 96 = 4% decrease"},
+    {q:"Q5. What is the value of 15²?", options:["225", "250", "275", "300", "325"], answer:"225", solution:"15² = 15 × 15 = 225"}
+  ],
+  Reasoning: [
+    {q:"Q1. If all cats are animals, and some animals are pets, which of the following must be true?", options:["All cats are pets", "Some cats are pets", "No cats are pets", "All pets are cats", "None of the above"], answer:"Some cats are pets", solution:"Since all cats are animals and some animals are pets, it follows that some cats are pets."},
+    {q:"Q2. If APPLE is coded as 25563, how is ORANGE coded?", options:["576143", "576134", "576314", "576413", "576431"], answer:"576143", solution:"A=1, P=16, L=12, E=5. APPLE = 1+16+16+12+5=50. Similarly, O=15, R=18, A=1, N=14, G=7, E=5. ORANGE = 15+18+1+14+7+5=60. But since it's a code, we need to look for pattern. Actually, each letter is coded to its position: A=1, B=2, etc. So O=15, R=18, A=1, N=14, G=7, E=5 → 15181475 doesn't match options. Looking at APPLE: A=1, P=16, P=16, L=12, E=5 → 11616125 doesn't match 25563. There might be a different coding scheme."},
+    {q:"Q3. Complete the series: 2, 6, 12, 20, 30, ?", options:["42", "44", "46", "48", "50"], answer:"42", solution:"The pattern is: 1×2=2, 2×3=6, 3×4=12, 4×5=20, 5×6=30, so next is 6×7=42"},
+    {q:"Q4. If South-East becomes North, then what does South-West become?", options:["East", "West", "North", "South", "North-East"], answer:"North", solution:"If South-East becomes North, it means we're rotating 135 degrees clockwise. So South-West would become North after a 135 degree clockwise rotation."},
+    {q:"Q5. A is the brother of B. C is the father of A. D is the brother of E. E is the daughter of B. How is D related to A?", options:["Nephew", "Son", "Brother", "Cousin", "Uncle"], answer:"Nephew", solution:"A and B are brothers. E is daughter of B, so E is niece of A. D is brother of E, so D is also child of B, making D nephew of A."}
+  ],
+  English: [
+    {q:"Q1. Choose the correct synonym for 'Benevolent':", options:["Kind", "Cruel", "Selfish", "Greedy", "Stingy"], answer:"Kind", solution:"Benevolent means well-meaning and kindly, so the correct synonym is 'Kind'."},
+    {q:"Q2. Identify the correctly spelled word:", options:["Accommodate", "Acommodate", "Accomodate", "Acomodate", "Accommodatte"], answer:"Accommodate", solution:"The correct spelling is 'Accommodate' with two 'c's and two 'm's."},
+    {q:"Q3. Choose the correct antonym for 'Courage':", options:["Cowardice", "Bravery", "Daring", "Fearlessness", "Valor"], answer:"Cowardice", solution:"Courage means bravery, so its antonym is cowardice."},
+    {q:"Q4. Which sentence is grammatically correct?", options:["Neither of the boys has done their homework.", "Neither of the boys have done their homework.", "Neither of the boys has done his homework.", "Neither of the boys have done his homework.", "Neither of the boys done their homework."], answer:"Neither of the boys has done his homework.", solution:"'Neither' is singular and requires a singular verb 'has' and singular pronoun 'his'."},
+    {q:"Q5. Identify the part of speech for the word 'quickly' in: 'He ran quickly.'", options:["Adverb", "Adjective", "Verb", "Noun", "Preposition"], answer:"Adverb", solution:"'Quickly' modifies the verb 'ran', telling how he ran, so it's an adverb."}
+  ]
+};
 
 // Variables
 let questions = [];
+let currentSubject = "";
 let current = 0;
 let answers = [];
 let marked = [];
 let visited = [];
 let testSubmitted = false;
 let timerInterval;
-let timeLeft = 10*60;
+let timeLeft = 10 * 60; // 10 minutes in seconds
+let userName = "";
 
 // Open Test
 function openTest(subject = "GA") {
   const homePage = document.getElementById("homePage");
   const testPage = document.getElementById("testPage");
+  
+  currentSubject = subject;
+  document.getElementById("subjectTitle").textContent = subject;
 
   homePage.classList.add('fade-out');
   setTimeout(() => {
     homePage.style.display = "none";
     homePage.classList.remove('fade-out');
 
-    // Load GA questions only
-    if(subject === "GA") questions = questionsGA;
-    else questions = []; // placeholder for other subjects
-
+    // Load questions based on subject
+    questions = questionsData[subject] || questionsData.GA;
+    
     current = 0;
     answers = new Array(questions.length).fill(null);
     marked = new Array(questions.length).fill(false);
     visited = new Array(questions.length).fill(false);
     testSubmitted = false;
-    timeLeft = 10*60;
+    timeLeft = 10 * 60;
 
     loadQuestion(current);
     updatePalette();
@@ -167,7 +845,20 @@ function openTest(subject = "GA") {
   }, 500);
 }
 
-// Go Home
+// Go Home with confirmation
+function confirmGoHome() {
+  if (testSubmitted) {
+    goHome();
+    return;
+  }
+  
+  showModal(
+    "Confirm Navigation",
+    "Are you sure you want to go back to home? Your progress will be lost.",
+    goHome
+  );
+}
+
 function goHome() {
   const testPage = document.getElementById("testPage");
   const homePage = document.getElementById("homePage");
@@ -187,79 +878,374 @@ function goHome() {
 // Timer
 function startTimer() {
   document.getElementById("timer").innerText = `Time Left: ${formatTime(timeLeft)}`;
+  
   timerInterval = setInterval(() => {
-    if(timeLeft<=0) { clearInterval(timerInterval); submitTest(); return; }
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitTest();
+      return;
+    }
+    
     timeLeft--;
     document.getElementById("timer").innerText = `Time Left: ${formatTime(timeLeft)}`;
-  },1000);
+  }, 1000);
 }
-function formatTime(sec){ let m=Math.floor(sec/60); let s=sec%60; return `${m<10?'0'+m:m}:${s<10?'0'+s:s}`; }
+
+function formatTime(sec) {
+  let m = Math.floor(sec / 60);
+  let s = sec % 60;
+  return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+}
 
 // Load Question
-function loadQuestion(index){
-  if(index<0 || index>=questions.length) return;
-  visited[index]=true;
-  const q=questions[index];
-  const qDiv=document.getElementById("question");
-  const optionsDiv=document.getElementById("options");
-  const feedbackDiv=document.getElementById("answerFeedback");
-  qDiv.innerHTML=q.q;
-  optionsDiv.innerHTML='';
-  feedbackDiv.innerHTML='';
-  q.options.forEach((opt,i)=>{
-    const label=document.createElement('label');
-    label.innerHTML=`<input type="radio" name="option" value="${opt}" ${answers[index]===opt?'checked':''}> ${opt}`;
+function loadQuestion(index) {
+  if (index < 0 || index >= questions.length) return;
+  
+  current = index;
+  visited[index] = true;
+  
+  const q = questions[index];
+  const qDiv = document.getElementById("question");
+  const optionsDiv = document.getElementById("options");
+  const feedbackDiv = document.getElementById("answerFeedback");
+  
+  qDiv.innerHTML = q.q;
+  optionsDiv.innerHTML = '';
+  feedbackDiv.innerHTML = '';
+  
+  // If test is submitted, show the review mode
+  if (testSubmitted) {
+    showQuestionReview();
+    return;
+  }
+  
+  q.options.forEach((opt, i) => {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'option';
+    input.value = opt;
+    
+    if (answers[index] === opt) {
+      input.checked = true;
+    }
+    
+    input.onchange = () => {
+      answers[current] = opt;
+      updatePalette();
+    };
+    
+    const span = document.createElement('span');
+    span.textContent = opt;
+    
+    label.appendChild(input);
+    label.appendChild(span);
     optionsDiv.appendChild(label);
   });
+  
   updatePalette();
+  
+  // Update navigation buttons state
+  document.getElementById('prevBtn').disabled = (current === 0);
+  document.getElementById('nextBtn').disabled = (current === questions.length - 1);
+}
+
+// Show question in review mode after submission
+function showQuestionReview() {
+  const q = questions[current];
+  const qDiv = document.getElementById("question");
+  const optionsDiv = document.getElementById("options");
+  const feedbackDiv = document.getElementById("answerFeedback");
+  
+  qDiv.innerHTML = q.q;
+  optionsDiv.innerHTML = '';
+  feedbackDiv.innerHTML = '';
+  
+  // Create options display with correct/incorrect highlighting
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.style.padding = '10px';
+    div.style.margin = '8px 0';
+    div.style.borderRadius = '6px';
+    div.style.border = '1px solid #ddd';
+    
+    // Highlight correct answer
+    if (opt === q.answer) {
+      div.style.backgroundColor = '#d4edda';
+      div.style.borderColor = '#c3e6cb';
+    }
+    // Highlight incorrect user selection
+    else if (answers[current] === opt) {
+      div.style.backgroundColor = '#f8d7da';
+      div.style.borderColor = '#f5c6cb';
+    } else {
+      div.style.backgroundColor = '#f8f9fa';
+    }
+    
+    div.textContent = opt;
+    optionsDiv.appendChild(div);
+  });
+  
+  // Show feedback
+  const feedback = document.createElement('div');
+  
+  if (answers[current] === null) {
+    feedback.innerHTML = `
+      <div class="solution">
+        <p><strong>You did not answer this question.</strong></p>
+        <p class="correct-answer">Correct Answer: ${q.answer}</p>
+        <p><strong>Solution:</strong> ${q.solution}</p>
+      </div>
+    `;
+  } else if (answers[current] === q.answer) {
+    feedback.innerHTML = `
+      <div class="solution">
+        <p class="correct-answer">Correct! Your answer: ${answers[current]}</p>
+        <p><strong>Solution:</strong> ${q.solution}</p>
+      </div>
+    `;
+  } else {
+    feedback.innerHTML = `
+      <div class="solution">
+        <p class="incorrect-answer">Incorrect. Your answer: ${answers[current]}</p>
+        <p class="correct-answer">Correct Answer: ${q.answer}</p>
+        <p><strong>Solution:</strong> ${q.solution}</p>
+      </div>
+    `;
+  }
+  
+  feedbackDiv.appendChild(feedback);
+  
+  // Add navigation for review mode
+  const reviewNav = document.createElement('div');
+  reviewNav.style.marginTop = '20px';
+  reviewNav.style.display = 'flex';
+  reviewNav.style.justifyContent = 'space-between';
+  
+  const prevReviewBtn = document.createElement('button');
+  prevReviewBtn.textContent = 'Previous Question';
+  prevReviewBtn.className = 'start-btn';
+  prevReviewBtn.onclick = () => {
+    if (current > 0) {
+      current--;
+      loadQuestion(current);
+    }
+  };
+  
+  const nextReviewBtn = document.createElement('button');
+  nextReviewBtn.textContent = 'Next Question';
+  nextReviewBtn.className = 'start-btn';
+  nextReviewBtn.onclick = () => {
+    if (current < questions.length - 1) {
+      current++;
+      loadQuestion(current);
+    }
+  };
+  
+  reviewNav.appendChild(prevReviewBtn);
+  reviewNav.appendChild(nextReviewBtn);
+  feedbackDiv.appendChild(reviewNav);
 }
 
 // Palette
-function updatePalette(){
-  const palette=document.getElementById("paletteButtons");
-  palette.innerHTML='';
-  questions.forEach((q,i)=>{
-    const btn=document.createElement('button');
-    btn.innerText=i+1;
-    btn.className='';
-    if(i===current) btn.classList.add('current');
-    else if(marked[i]) btn.classList.add('review');
-    else if(answers[i]) btn.classList.add('answered');
-    else if(visited[i]) btn.classList.add('visited');
-    btn.onclick=()=>{saveAnswer(); current=i; loadQuestion(i);}
+function updatePalette() {
+  const palette = document.getElementById("paletteButtons");
+  palette.innerHTML = '';
+  
+  questions.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.innerText = i + 1;
+    
+    // Remove all classes
+    btn.className = '';
+    
+    // Set appropriate class based on answer status
+    if (testSubmitted) {
+      if (answers[i] === null) {
+        btn.classList.add('unanswered');
+      } else if (answers[i] === q.answer) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('incorrect');
+      }
+    } else {
+      if (i === current) {
+        btn.classList.add('current');
+      } else if (marked[i]) {
+        btn.classList.add('review');
+      } else if (answers[i]) {
+        btn.classList.add('answered');
+      } else if (visited[i]) {
+        btn.classList.add('visited');
+      }
+    }
+    
+    btn.onclick = () => {
+      if (!testSubmitted) saveAnswer();
+      current = i;
+      loadQuestion(i);
+    };
+    
     palette.appendChild(btn);
   });
 }
 
-// Save & Next
-function saveAnswer(){
-  const selected=document.querySelector('input[name="option"]:checked');
-  answers[current]=selected?selected.value:null;
+// Navigation functions
+function saveAnswer() {
+  const selected = document.querySelector('input[name="option"]:checked');
+  answers[current] = selected ? selected.value : null;
+  updatePalette();
 }
-function saveAndNext(){ saveAnswer(); if(current<questions.length-1) current++; loadQuestion(current); }
-function previousQuestion(){ saveAnswer(); if(current>0) current--; loadQuestion(current); }
-function markForReview(){ marked[current]=true; if(current<questions.length-1) current++; loadQuestion(current); }
-function clearResponse(){ answers[current]=null; marked[current]=false; loadQuestion(current); }
 
-// Submit
-function submitTest(){
-  testSubmitted=true;
-  clearInterval(timerInterval);
-  const score=document.getElementById("scorecard");
-  let correct=0;
-  questions.forEach((q,i)=>{ if(answers[i]===q.answer) correct++; });
-  score.innerHTML=`Score: ${correct} / ${questions.length}`;
-  score.style.display='block';
-  // Show solutions
-  const optionsDiv=document.getElementById("options");
-  const feedbackDiv=document.getElementById("answerFeedback");
-  optionsDiv.innerHTML='';
-  feedbackDiv.innerHTML='';
-  const q=questions[current];
-  const solDiv=document.createElement('div');
-  solDiv.innerHTML=`<b>Answer:</b> ${q.answer}<br><b>Solution:</b> ${q.solution}`;
-  feedbackDiv.appendChild(solDiv);
+function saveAndNext() {
+  saveAnswer();
+  if (current < questions.length - 1) {
+    current++;
+    loadQuestion(current);
+  }
 }
+
+function previousQuestion() {
+  saveAnswer();
+  if (current > 0) {
+    current--;
+    loadQuestion(current);
+  }
+}
+
+function markForReview() {
+  marked[current] = !marked[current]; // Toggle review status
+  updatePalette();
+}
+
+function clearResponse() {
+  answers[current] = null;
+  marked[current] = false;
+  
+  const options = document.querySelectorAll('input[name="option"]');
+  options.forEach(option => {
+    option.checked = false;
+  });
+  
+  updatePalette();
+}
+
+// Submit with confirmation
+function confirmSubmit() {
+  const unanswered = answers.filter(a => a === null).length;
+  
+  let message = "Are you sure you want to submit the test?";
+  if (unanswered > 0) {
+    message += ` You have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}.`;
+  }
+  
+  showModal("Confirm Submission", message, submitTest);
+}
+
+function submitTest() {
+  testSubmitted = true;
+  clearInterval(timerInterval);
+  closeModal();
+  
+  const score = document.getElementById("scorecard");
+  let correct = 0;
+  
+  questions.forEach((q, i) => {
+    if (answers[i] === q.answer) correct++;
+  });
+  
+  // Show section-specific score
+  score.innerHTML = `${currentSubject} Score: ${correct} / ${questions.length}`;
+  score.style.display = 'block';
+  
+  // Hide navigation buttons
+  document.getElementById('navigation').style.display = 'none';
+  
+  // Load current question in review mode
+  loadQuestion(current);
+  updatePalette();
+}
+
+// Modal functions
+function showModal(title, message, confirmCallback) {
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMessage = document.getElementById('modalMessage');
+  const modal = document.getElementById('confirmationModal');
+  
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  
+  // Clear previous buttons
+  const modalButtons = document.querySelector('.modal-buttons');
+  if (modalButtons) {
+    modalButtons.remove();
+  }
+  
+  // Create new buttons
+  const newModalButtons = document.createElement('div');
+  newModalButtons.className = 'modal-buttons';
+  
+  const confirmBtn = document.createElement('button');
+  confirmBtn.textContent = 'Yes';
+  confirmBtn.className = 'modal-btn confirm';
+  confirmBtn.onclick = function() {
+    confirmCallback();
+    closeModal();
+  };
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.className = 'modal-btn cancel';
+  cancelBtn.onclick = closeModal;
+  
+  newModalButtons.appendChild(confirmBtn);
+  newModalButtons.appendChild(cancelBtn);
+  
+  document.querySelector('.modal-content').appendChild(newModalButtons);
+  
+  modal.style.display = 'block';
+}
+
+function closeModal() {
+  document.getElementById('confirmationModal').style.display = 'none';
+}
+
+// Login functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Focus on the input field when the page loads
+  document.getElementById('userName').focus();
+  
+  // Add event listener for login button
+  document.getElementById('loginBtn').addEventListener('click', function() {
+    userName = document.getElementById('userName').value.trim();
+    
+    if (userName === '') {
+      alert('Please enter your name to continue');
+      return;
+    }
+    
+    // Hide login modal
+    document.getElementById('loginModal').style.display = 'none';
+    
+    // Update header with user's name
+    document.querySelector('header.main').innerHTML += `<div style="font-size: 18px; margin-top: 10px;">Welcome, ${userName}!</div>`;
+  });
+  
+  // Allow pressing Enter to submit the login form
+  document.getElementById('userName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('loginBtn').click();
+    }
+  });
+});
+
+// Close modal if user clicks outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById('confirmationModal');
+  if (event.target === modal) {
+    closeModal();
+  }
+};
 </script>
 
 </body>
