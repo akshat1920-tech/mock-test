@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA Test X - MOCKLIT</title>
+<style>
+body { margin:0; font-family:Arial,sans-serif; background:#cce7ff; display:flex; flex-direction:column; }
+.top-bar { display:flex; justify-content:flex-start; align-items:center; padding:10px 20px; background:#b3d9ff; }
+.top-bar a.home-btn { padding:8px 16px; background:#1e90ff; color:white; text-decoration:none; border-radius:6px; transition:0.3s; display:none; }
+.top-bar a.home-btn:hover { background:#004aad; }
+.main-content { display:flex; flex:1; }
+.left-box { width:80%; padding:20px; display:flex; flex-direction:column; justify-content:flex-start; }
+.question-box { background:white; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.2); margin-bottom:20px; min-height:300px; }
+.right-box { width:20%; background:#b3d9ff; padding:20px; display:flex; flex-direction:column; justify-content:flex-start; color:black; }
+.timer { position:absolute; top:10px; right:10px; font-size:1.2em; font-weight:bold; color:#003366; }
+.options button { display:block; width:100%; padding:12px; margin:8px 0; text-align:left; border-radius:8px; border:1px solid #1e90ff; cursor:pointer; background:#f0f0f0; transition:0.3s; }
+.options button:hover{background:#d0e4ff;} 
+.options button.selected{background:#4caf50;color:white;}
+.nav-buttons { display:flex; justify-content:space-between; margin-top:10px; flex-wrap:wrap; gap:5px;}
+.nav-buttons button { padding:10px 15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; background:#1e90ff; color:white; transition:0.3s; flex:1;}
+.nav-buttons button:hover{background:#004aad;}
+.right-box .question-palette { display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:8px; margin-bottom:20px; }
+.right-box .question-palette div { width:40px; height:40px; background:#e0f7ff; color:black; display:flex; align-items:center; justify-content:center; border-radius:5px; cursor:pointer; font-weight:bold; transition:0.3s; }
+.right-box .question-palette div.visited{background:orange;color:white;}
+.right-box .question-palette div.answered{background:green;color:white;}
+.right-box .question-palette div.marked{background:purple;color:white;}
+.right-box .question-palette div.correct{background:green;color:white;}
+.right-box .question-palette div.incorrect{background:red;color:white;}
+.solution{margin-top:10px;background:#e0f0ff;padding:10px;border-radius:8px;}
+.scorecard{margin-top:20px;background:#fff9c4;padding:15px;border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="home-btn" id="home-btn-top">Home</a>
+</div>
+
+<div class="timer" id="timer">10:00</div>
+
+<div class="main-content">
+<div class="left-box">
+  <div class="question-box">
+    <div id="question-text"></div>
+    <div class="options" id="options"></div>
+    <div class="solution" id="solution" style="display:none;"></div>
+    <div class="scorecard" id="scorecard" style="display:none;"></div>
+  </div>
+  <div class="nav-buttons">
+    <button id="prev-btn">Previous</button>
+    <button id="mark-btn">Mark for Review</button>
+    <button id="clear-btn">Clear</button>
+    <button id="save-next-btn">Save & Next</button>
+    <button class="home-btn" id="home-btn-bottom" style="display:none;">Home</button>
+  </div>
+</div>
+
+<div class="right-box">
+  <div class="question-palette" id="palette"></div>
+  <div style="margin-top:10px;">
+    <button id="submit-btn">Submit Test</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// GA Mock Test Questions
+const questions = [
+  {q:"ISRO inaugurated the HOPE analogue mission in Tso Kar Valley, Ladakh. What is the full form of the letter E in HOPE analogue mission?", options:["Experience","Earth","Excellence","Expedition","Exploration"], answer:4, solution:"HOPE stands for Himalayan Outpost for Planetary Exploration. The mission is a terrestrial analogue mission to test technologies and systems for future planetary exploration missions."},
+  {q:"The Indian Army signed an MoU with a company for the procurement of new-generation 50-ton transporter trailers worth ₹223.95 crore. Which company is this?", options:["Tata Advanced Systems","Axicades Aerospace and Technology Pvt. Ltd.","Larsen & Toubro","Bharat Electronics Limited","Mahindra Defence Systems"], answer:1, solution:"The MoU was signed with Axicades Aerospace and Technology Pvt. Ltd. for procurement of 212 advanced 50-ton tank transporter trailers for the Indian Army."},
+  {q:"Indian Navy received the third ship of Project 17A stealth frigate, Himgiri. Which company built Himgiri?", options:["Mazagon Dock Shipbuilders Ltd","Cochin Shipyard","Garden Reach Shipbuilders & Engineers (GRSE)","Hindustan Shipyard Ltd","L&T Shipbuilding"], answer:2, solution:"The Himgiri, part of Project 17A, was built by GRSE and officially handed over to the Indian Navy in Kolkata, West Bengal."},
+  {q:"Ant Financial sold what percentage of stakes in Paytm for ₹383 crore?", options:["3.21%","5.84%","7.50%","10%","12%"], answer:1, solution:"Ant Financial sold 5.84% of its stake in Paytm for ₹383 crore as part of its portfolio restructuring."},
+  {q:"RBI approved the merger of New India Co-operative Bank with which bank?", options:["Saraswat Co-operative Bank","Punjab & Maharashtra Co-operative Bank","HDFC Bank","State Bank of India","Canara Bank"], answer:0, solution:"RBI approved the merger of New India Co-operative Bank with Saraswat Co-operative Bank to strengthen banking operations and consolidate cooperative banking."},
+  {q:"The Competition Commission of India approved the acquisition of 100% stake in Jai Prakash Associates Limited by which company?", options:["UltraTech Cement","Dalmia Cement Bharat Limited","ACC Limited","Ambuja Cements","Shree Cement"], answer:1, solution:"Dalmia Cement Bharat Limited acquired 100% stake in Jai Prakash Associates Limited, approved by the CCI, as part of business expansion strategy."},
+  {q:"Who has been appointed as Director of Vikram Sarabhai Space Centre, Thiruvananthapuram?", options:["K. Sivan","A. Rajarajan","S. Unnikrishnan","M. Annadurai","R. Umamaheshwaran"], answer:1, solution:"A. Rajarajan has been appointed as the Director of Vikram Sarabhai Space Centre, Kerala, which is a premier center for ISRO’s launch vehicle and space technology research."},
+  {q:"PM Narendra Modi's flagship platform Pariksha Pe Charcha achieved a Guinness World Record for 'the most people registered on a citizen engagement platform in one month.' What is the number of valid registrations?", options:["1.5 crore","2.75 crore","3.53 crore","4.20 crore","5 crore"], answer:2, solution:"The initiative, launched in collaboration with MyGov, achieved 3.53 crore valid registrations, setting a Guinness World Record for citizen engagement."},
+  {q:"At the 70th National Film Awards 2023, which actress won Best Actress and for which movie?", options:["Deepika Padukone – 'Chhapaak'","Alia Bhatt – 'Gangubai Kathiawadi'","Rani Mukherjee – 'Mrs. Chatterjee vs Norway'","Taapsee Pannu – 'Shabaash Mithu'","Kiara Advani – 'Bhool Bhulaiyaa 2'"], answer:2, solution:"Rani Mukherjee won Best Actress for Mrs. Chatterjee vs Norway. The Best Actor award went to Shahrukh Khan and Vikrant Massey. Best Feature Film: '12 Fail' directed by Vinod Chopra."},
+  {q:"Reliance Industries ranked 88th in the Fortune Global 500 list of 2025. What is its revenue?", options:["$98.5 billion","$105.6 billion","$114.12 billion","$120.3 billion","$130 billion"], answer:2, solution:"Reliance Industries achieved the 88th spot on the Fortune Global 500 list with a revenue of $114.12 billion USD, reflecting its large-scale industrial operations."},
+  {q:"National Council of Applied Economic Research (NCAER) released the Business Expectation Survey in June 2025, covering 479 companies. What is the value of the Business Confidence Index?", options:["120.5","134.2","149.4","156.7","162.1"], answer:2, solution:"The Business Confidence Index (BCI) recorded by NCAER was 149.4, indicating optimism in business expectations among companies in major Indian cities."},
+  {q:"Indian Association of Gold Excellence and Standard (IAGES) signed an MoU with which organization to implement a robust accreditation framework for the gold industry?", options:["SEBI","RBI","Institute of Chartered Accountants of India (ICAI)","BIS","Ministry of Commerce"], answer:2, solution:"IAGES collaborated with ICAI to implement a robust accreditation and standardization framework for value chain partners in the gold industry."},
+  {q:"Which joint venture in India issued unlisted non-convertible debentures worth ₹9,000 crore?", options:["GMR Hyderabad International Airport","BIAL (Bangalore International Airport Limited)","Adani Airports","Delhi International Airport Ltd","Mumbai International Airport Pvt. Ltd"], answer:1, solution:"BIAL issued unlisted non-convertible debentures worth ₹9,000 crore to fund expansion and operations."},
+  {q:"Google is building a $6 billion data center in which Indian city?", options:["Hyderabad","Bengaluru","Visakhapatnam","Pune","Chennai"], answer:2, solution:"Google is investing $6 billion to construct a data center in Visakhapatnam, boosting cloud infrastructure and digital services in India."},
+  {q:"Which bank introduced the first-ever lock FD feature to prevent term deposits from being broken digitally?", options:["State Bank of India","ICICI Bank","HDFC Bank","Axis Bank","Bank of Baroda"], answer:3, solution:"Axis Bank launched the Lock FD feature to provide customers enhanced control over term deposits and prevent premature digital withdrawals."},
+  {q:"Bank of Baroda launched Bob FxOne for corporate and MSME customers. What is its function?", options:["Loan management system","Digital forex platform for treasury operations","Investment advisory tool","Retail banking app","Insurance portal"], answer:1, solution:"Bob FxOne is a digital forex platform designed to digitize treasury operations and simplify forex dealing for corporate and MSME customers."},
+  {q:"RBI announced three consumer-friendly schemes to drive financial inclusion. Which of the following schemes was announced?", options:["Simplified REYC Pro features","Streamlined claims for deceased account holders","Enhanced features on the Retail Direct platform for G-Secs","All of the above","None of the above"], answer:3, solution:"RBI introduced all three initiatives to enhance financial inclusion, simplify banking processes, and improve user experience for investors and consumers."}
+];
+
+let current=0;
+const userAnswers = Array(questions.length).fill(null);
+const marked = Array(questions.length).fill(false);
+const visited = Array(questions.length).fill(false);
+let submitted=false;
+
+const questionText = document.getElementById('question-text');
+const optionsDiv = document.getElementById('options');
+const solutionDiv = document.getElementById('solution');
+const paletteDiv = document.getElementById('palette');
+const submitBtn = document.getElementById('submit-btn');
+const scorecardDiv = document.getElementById('scorecard');
+const homeTop = document.getElementById('home-btn-top');
+const homeBottom = document.getElementById('home-btn-bottom');
+const timerEl = document.getElementById('timer');
+
+function renderQuestion(index){
+  const q = questions[index];
+  questionText.innerHTML = `<strong>Q${index+1}:</strong> ${q.q}`;
+  optionsDiv.innerHTML='';
+  solutionDiv.style.display = submitted ? 'block' : 'none';
+
+  q.options.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.innerText = opt;
+    if(userAnswers[index]===i) btn.classList.add('selected');
+
+    if(submitted){
+      if(userAnswers[index]===i && i===q.answer) btn.style.backgroundColor="#4caf50"; 
+      else if(userAnswers[index]===i && i!==q.answer) btn.style.backgroundColor="red"; 
+      else if(i===q.answer) btn.style.backgroundColor="#4caf50"; 
+    } else {
+      btn.onclick = ()=>{
+  userAnswers[index] = i;
+  visited[index] = true;
+  if(marked[index]) marked[index] = false; // remove marked flag if answered
+  updatePalette();
+  renderQuestion(index);
+};
+
+    }
+    optionsDiv.appendChild(btn);
+  });
+
+  if(submitted){
+    const ua = userAnswers[index]!==null?q.options[userAnswers[index]]:'Not Answered';
+    const ca = q.options[q.answer];
+    solutionDiv.style.display='block';
+    solutionDiv.innerHTML = `Your Answer: ${ua}<br>Correct Answer: ${ca}<br><strong>Solution:</strong> ${q.solution}`;
+  }
+
+  visited[index]=true;
+  updatePalette();
+}
+
+function updatePalette(){
+  paletteDiv.innerHTML='';
+  questions.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.innerText=i+1;
+    if(submitted){
+      if(userAnswers[i]===q.answer) div.className='correct';
+      else if(userAnswers[i]!==null) div.className='incorrect';
+      else div.style.background='#e0f7ff';
+    } else{
+      if(marked[i]) div.className='marked';
+      else if(userAnswers[i]!==null) div.className='answered';
+      else if(visited[i]) div.className='visited';
+      else div.style.background='#e0f7ff';
+    }
+    div.onclick=()=>{current=i; renderQuestion(current);}
+    paletteDiv.appendChild(div);
+  });
+}
+
+// Navigation buttons
+document.getElementById('prev-btn').onclick = ()=>{ current = (current-1+questions.length)%questions.length; renderQuestion(current);}
+document.getElementById('mark-btn').onclick = ()=>{
+    marked[current] = true;   // mark current question
+    visited[current] = true;  // mark as visited
+    updatePalette();
+    current = (current + 1) % questions.length; // move to next question
+    renderQuestion(current);
+};
+
+document.getElementById('clear-btn').onclick = ()=>{ userAnswers[current]=null; visited[current]=true; updatePalette(); renderQuestion(current);}
+document.getElementById('save-next-btn').onclick = ()=>{ visited[current]=true; current=(current+1)%questions.length; renderQuestion(current); }
+
+submitBtn.onclick = ()=>{
+  submitted=true;
+  clearInterval(timerInterval);
+  timerEl.style.display='none';
+  submitBtn.style.display='none';
+  document.getElementById('mark-btn').style.display='none';
+  document.getElementById('clear-btn').style.display='none';
+  document.getElementById('save-next-btn').style.display='none';
+  homeTop.style.display='inline-block';
+  homeBottom.style.display='inline-block';
+
+  // Scorecard
+  let correct=0, incorrect=0, unanswered=0;
+  questions.forEach((q,i)=>{
+    if(userAnswers[i]===null) unanswered++;
+    else if(userAnswers[i]===q.answer) correct++;
+    else incorrect++;
+  });
+  let scoreText = `<strong>Scorecard:</strong><br>Correct: ${correct}<br>Incorrect: ${incorrect}<br>Unanswered: ${unanswered}<br><br><strong>Detailed Solutions:</strong><br>`;
+  questions.forEach((q,i)=>{
+    const ua = userAnswers[i]!==null?q.options[userAnswers[i]]:'Not Answered';
+    scoreText += `Q${i+1}: ${q.q}<br>Your Answer: ${ua}<br>Correct Answer: ${q.options[q.answer]}<br>Solution: ${q.solution}<br><br>`;
+  });
+  scorecardDiv.style.display='block';
+  scorecardDiv.innerHTML=scoreText;
+
+  renderQuestion(current);
+};
+
+// Timer
+let time=10*60;
+const timerInterval=setInterval(()=>{
+  let m=Math.floor(time/60); let s=time%60;
+  timerEl.innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  if(time===0){ clearInterval(timerInterval); alert("Time Over!"); submitBtn.click(); }
+  time--;
+},1000);
+
+renderQuestion(current);
+</script>
+</body>
+</html>
